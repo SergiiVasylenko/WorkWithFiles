@@ -1,17 +1,18 @@
 ﻿using System;
 using System.IO;
 
-namespace Task1
+namespace Task2
 {
     class Program
     {
         static void Main(string[] args)
         {
-            var folderPath = @"C:\Users\Sergii\Desktop\CleanFolder";
+            var folderPath = @"C:\Users\Sergii\Desktop\MyFolder";
             if (Directory.Exists(folderPath))
             {
                 var directory = new DirectoryInfo(folderPath);
-                RemoveFiles(directory);
+                var size = CalculateSize(directory);
+                Console.WriteLine($"Size folder is {size}");
             }
             else
             {
@@ -21,34 +22,28 @@ namespace Task1
             Console.ReadKey();
         }
 
-        public static void RemoveFiles(DirectoryInfo directory)
+        public static long CalculateSize(DirectoryInfo directory)
         {
+            long size = 0;
             try
             {
                 var files = directory.GetFiles();
                 foreach (var file in files)
                 {
-                    if (DateTime.Now.Subtract(file.LastAccessTime) > TimeSpan.FromMinutes(30))
-                    {
-                        file.Delete();
-                    }
+                    size += file.Length;
                 }
 
                 var directories = directory.GetDirectories();
                 foreach (var dir in directories)
                 {
-                    RemoveFiles(dir);
-                    if (DateTime.Now.Subtract(dir.LastAccessTime) > TimeSpan.FromMinutes(30))
-                    {
-                        dir.Delete(false);
-                    }
-                    
+                    size += CalculateSize(dir);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erroe {ex.Message}");
+                Console.WriteLine($"Error {ex.Message}");
             }
+            return size;
         }
     }
 }
